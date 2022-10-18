@@ -2,14 +2,46 @@ import React, { useContext, useState } from 'react'
 import { GlobalStoreContext } from '../store'
 
 function SongCard(props) {
-
     const { store } = useContext(GlobalStoreContext);
+    const [draggedTo, setDraggedTo] = useState(false);
+
+    function handleDragStart(event) {
+        event.dataTransfer.setData("item", event.target.id);
+    }
+
+    function handleDragOver(event) {
+        event.preventDefault();
+    }
+
+    function handleDragEnter(event) {
+        event.preventDefault();
+        setDraggedTo(true);
+    }
+
+    function handleDragLeave(event) {
+        event.preventDefault();
+        setDraggedTo(false);
+    }
+
+    function handleDrop(event) {
+        event.preventDefault();
+        let target = event.target;
+        let targetId = target.id;
+        targetId = targetId.substring(target.id.indexOf("-") + 1);
+        let sourceId = event.dataTransfer.getData("item");
+        sourceId = sourceId.substring(sourceId.indexOf("-") + 1);
+        setDraggedTo(false);
+
+        // UPDATE THE LIST
+        store.MoveSongTransaction(parseInt(sourceId),parseInt(targetId));
+    }
 
     function removeSongHandler () {
         store.removeSong1(index)
     }
 
-    function editHandler (){
+    function editHandler (event){
+        event.preventDefault();
         store.editSong1(index)
     }
 
@@ -21,6 +53,12 @@ function SongCard(props) {
             id={'song-' + index + '-card'}
             className={cardClass}
             onDoubleClick= {editHandler}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDragEnter={handleDragEnter}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            draggable="true"
         >
             {index + 1}.
             <a

@@ -1,7 +1,15 @@
 import { createContext, useState } from 'react'
 import jsTPS from '../common/jsTPS'
 import api from '../api'
+import AddSong_Transaction from '../transactions/AddSong_Transaction';
+import DeleteSong_Transaction from '../transactions/DeleteSong_Transaction';
+import EditSong_Transaction from '../transactions/EditSong_Transaction';
+import MoveSong_Transaction from '../transactions/MoveSong_Transaction';
+
 export const GlobalStoreContext = createContext({});
+//import DeleteSong_Transaction from '../transactions/DeleteSong_Transaction';
+//import EditSong_Transaction from '../transactions/EditSong_Transaction';
+
 /*
     This is our global data store. Note that it uses the Flux design pattern,
     which makes use of things like actions and reducers. 
@@ -214,6 +222,25 @@ export const useGlobalStore = () => {
     
     }
 
+    store.deleteLastElement = (songToDelete) => {
+        let newListRemove = store.currentList;
+        
+        (newListRemove.songs).splice(songToDelete, 1)
+        async function asyncaddSong() {
+            const response = await api.updatePlaylistAddSong(store.currentList._id, newListRemove);
+            if (response.data.success) {
+                storeReducer({
+                    type: GlobalStoreActionType.SET_CURRENT_LIST,
+                    payload: newListRemove
+                });
+            }
+            else {
+                console.log("API FAILED TO ADD SONG");
+            }
+        }
+        asyncaddSong();
+    }
+
     store.removeSong1 = function (index){
          storeReducer({
              type: GlobalStoreActionType.MARK_SONG_FOR_DELETION,
@@ -229,18 +256,37 @@ export const useGlobalStore = () => {
         modal.classList.remove("is-visible"); 
     }
 
-    store.removeSong2 = function (){
-        console.log(store.currentList)
+    store.removeSong2 = function (indexTodelete){
         let newListRemove = store.currentList;
         
-        (newListRemove.songs).splice(store.IndxToDel, 1)
-    
+        (newListRemove.songs).splice(indexTodelete, 1)
         async function asyncaddSong() {
             const response = await api.updatePlaylistAddSong(store.currentList._id, newListRemove);
             if (response.data.success) {
                 storeReducer({
                     type: GlobalStoreActionType.SET_CURRENT_LIST,
                     payload: newListRemove
+                });
+            //    store.loadIdNamePairs() // update playlist in
+            let modal = document.getElementById("delete-song-modal");
+            modal.classList.remove("is-visible"); 
+            }
+            else {
+                console.log("API FAILED TO ADD SONG");
+            }
+        }
+        asyncaddSong();
+    }
+
+    store.addSongBack = function (indexWhere, elementBack){
+        let newListAddedback = store.currentList
+        newListAddedback.songs.splice(indexWhere,0,elementBack);
+        async function asyncaddSong() {
+            const response = await api.updatePlaylistAddSong(store.currentList._id, newListAddedback);
+            if (response.data.success) {
+                storeReducer({
+                    type: GlobalStoreActionType.SET_CURRENT_LIST,
+                    payload: newListAddedback
                 });
             //    store.loadIdNamePairs() // update playlist in
             let modal = document.getElementById("delete-song-modal");
@@ -270,7 +316,45 @@ export const useGlobalStore = () => {
         asyncRemovePlaylist()
     }
 
+    store.editSong1 = function(index) {
+        storeReducer({
+            type: GlobalStoreActionType.MARK_SONG_FOR_DELETION,
+            payload: index
+        });
 
+        let modal = document.getElementById("edit-song-modal");
+        modal.classList.add("is-visible");
+        return
+    }
+
+    store.editSongCancel = function(){
+        let modal = document.getElementById("edit-song-modal");
+        modal.classList.remove("is-visible");
+    }
+
+    store.editSong2 = function(index, anyElement) {
+        let newListEdit = store.currentList;
+
+        newListEdit.songs[index] = anyElement;
+
+        async function asyncEditSong() {
+            const response = await api.updatePlaylistAddSong(store.currentList._id, newListEdit);
+            if (response.data.success) {
+                storeReducer({
+                    type: GlobalStoreActionType.SET_CURRENT_LIST,
+                    payload: newListEdit
+                });
+                let modal = document.getElementById("edit-song-modal");
+                modal.classList.remove("is-visible"); 
+            }
+            
+            else{
+                console.log("API FAILED TO EDIT SONG")
+            }
+        }
+        asyncEditSong()
+
+    }
 
     //createNewList
     store.createNewList = function () {
@@ -342,6 +426,75 @@ export const useGlobalStore = () => {
             payload: null
         });
     }
+
+    store.addSongTransaction = () => {
+        let newaddtransaction = new AddSong_Transaction(store);
+        tps.addTransaction(newaddtransaction);
+    }
+
+    store.deleteSongTransaction = () => {
+        let index = store.IndxToDel;
+        let newElement = store.currentList.songs[index]; //replaces the element there
+        let newDeltransaction = new DeleteSong_Transaction(store, index, newElement);
+        tps.addTransaction(newDeltransaction);
+    }
+
+    store.editSongTransaction = () => {
+        var theTitle = document.getElementById("titleText").value;
+        var theArtist = document.getElementById("artistText").value;
+        var theYoutubeID = document.getElementById("youtubeId").value;
+
+        let newElement = {
+            artist: theArtist,
+            title: theTitle,
+            youTubeId: theYoutubeID,
+        }
+         let index = store.IndxToDel;
+         let oldElement = store.currentList.songs[index]
+         let newEdittransaction = new EditSong_Transaction(store, index, newElement, oldElement)
+         tps.addTransaction(newEdittransaction);
+    }
+
+    store.moveSong = function(start, end) {
+        
+        let list = store.currentList
+
+        if (start < end) {
+            let temp = list.songs[start];
+            for (let i = start; i < end; i++) {
+                list.songs[i] = list.songs[i + 1];
+            }
+            list.songs[end] = temp;
+        }
+        else if (start > end) {
+            let temp = list.songs[start];
+            for (let i = start; i > end; i--) {
+                list.songs[i] = list.songs[i - 1];
+            }
+            list.songs[end] = temp;
+        }
+        
+        async function updateListForMoveSong() {
+            const response = await api.updatePlaylistAddSong(store.currentList._id, list);
+            if (response.data.success) {
+                storeReducer({
+                    type: GlobalStoreActionType.SET_CURRENT_LIST,
+                    payload: list
+                });
+            }
+            else {
+                console.log("API FAILED TO MOVE SONG");
+            }
+        }
+        updateListForMoveSong();
+
+    }
+
+    store.MoveSongTransaction = function (starts, ends) {
+        let transaction = new MoveSong_Transaction(store, starts, ends);
+        tps.addTransaction(transaction);
+    }
+
 
     // THIS GIVES OUR STORE AND ITS REDUCER TO ANY COMPONENT THAT NEEDS IT
     return { store, storeReducer };
