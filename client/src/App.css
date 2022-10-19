@@ -60,6 +60,7 @@ body {
   grid-row: 1 / 2;
   background-color: transparent;
   float:right;
+  display:flex;
 }
 
 #playlist-selector, #playlist-cards {
@@ -230,6 +231,97 @@ input {
 
 #confirm-cancel-container {
   text-align:center;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--black);
+  color: var(--swatch-text);
+  cursor: pointer;
+  visibility: hidden;
+  opacity: 0;
+  transition: all 0.35s ease-in;
+}
+
+.modal.is-visible {
+  visibility: visible;
+  opacity: 1;
+}
+
+.removeSong{
+  float: right;
+}
+
+.modal-root {
+  position: relative;
+  max-width: 1200vw;
+  max-height: 600vh;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  background: var(--swatch-complement);
+  cursor: default;
+  border-width: 2px;
+  border-color: black;
+  border-style: solid;
+  box-shadow: 5px 10px #888888;
+}
+
+.modal-root > * {
+  padding: 1rem;
+}
+
+.modal-north {
+  font-size:28pt;
+  font-weight: bold;
+  background-color: #669966;
+  color:white;
+}
+
+.modal-center {
+  display: grid;
+  grid-template-columns: 40% 60%;
+  grid-template-rows: 33% 33% 33%;
+  gap: 10px 10px;
+  font-size: 25pt;
+}
+
+span {
+  font-weight: bold;
+  font-style: italic;
+}
+
+.modal-south {
+  display:flex;
+  flex-direction: row;
+  background-color: lightgray;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-center-content {
+  grid-column: 1 / 3;
+  grid-row: 1 / 4;
+}
+
+.modal-prompt {  
+  font-size:28pt;
+  font-weight: bold;
+}
+
+.modal-textfield {
+  font-size:28pt;
+}
+
+.modal-button {
+  font-size: 20pt;
 }
 
 /* ANIMATIONS

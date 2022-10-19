@@ -17,7 +17,6 @@ export const GlobalStoreContext = createContext({});
     @author McKilla Gorilla
 */
 
-
 // THESE ARE ALL THE TYPES OF UPDATES TO OUR GLOBAL
 // DATA STORE STATE THAT CAN BE PROCESSED
 export const GlobalStoreActionType = {
@@ -45,7 +44,7 @@ export const useGlobalStore = () => {
         newListCounter: 0,
         listNameActive: false,
         IndxToDel: 0,
-        IndxSongToDel: 0
+        IndxSongToDel: 0        
     });
     
 
@@ -139,6 +138,7 @@ export const useGlobalStore = () => {
     // RESPONSE TO EVENTS INSIDE OUR COMPONENTS.
 
     // THIS FUNCTION PROCESSES CHANGING A LIST NAME
+    
     store.changeListName = function (id, newName) {
         // GET THE LIST
         async function asyncChangeListName(id) {
@@ -185,6 +185,7 @@ export const useGlobalStore = () => {
             type: GlobalStoreActionType.MARK_LIST_FOR_DELETION,
             payload: id
         });
+
 
         let modal = document.getElementById("delete-list-modal");
         modal.classList.add("is-visible");

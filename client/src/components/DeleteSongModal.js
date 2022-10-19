@@ -2,8 +2,12 @@ import React, { Component, useContext, useState } from 'react';
 import { GlobalStoreContext } from '../store'
 
 function DeleteSongModal() {
-    //const [idNamePair, currentLists, newListCounters, listNameActives] = useState('');
     const {store} = useContext(GlobalStoreContext)
+    //store.currentList.songs[store.IndxSongToDel]
+    let songName = '';
+    if(store.currentList != null && store.currentList.songs != null && store.IndxToDel != null){
+        songName = (store.currentList.songs[store.IndxToDel].title);
+    }
 
         return (
             <div 
@@ -16,7 +20,7 @@ function DeleteSongModal() {
                         </div>
                         <div className="modal-center">
                             <div className="modal-center-content">
-                                Are you sure you wish to permanently delete the replace playlist?
+                                Are you sure you wish to permanently delete {songName} from the playlist?
                             </div>
                         </div>
                         <div className="modal-south">

@@ -4,6 +4,16 @@ import { GlobalStoreContext } from '../store'
 function DeleteListModal() {
     //const [idNamePair, currentLists, newListCounters, listNameActives] = useState('');
     const {store} = useContext(GlobalStoreContext)
+    let name = ''
+
+    if (store.IndxToDel != null) {
+        //name = store.currLists[store.IndxToDel]
+         for (let i = 0; i < store.idNamePairs.length; i++) {
+             if(store.IndxToDel === store.idNamePairs[i]._id){
+                name = store.idNamePairs[i].name
+             }
+         }
+    } 
 
         return (
             <div 
@@ -16,7 +26,7 @@ function DeleteListModal() {
                         </div>
                         <div className="modal-center">
                             <div className="modal-center-content">
-                                Are you sure you wish to permanently delete the replace playlist?
+                                Are you sure you wish to permanently delete the {name} playlist?
                             </div>
                         </div>
                         <div className="modal-south">
