@@ -42,6 +42,7 @@ function SongCard(props) {
 
     function editHandler (event){
         event.preventDefault();
+        store.setSongEditActive();
         store.editSong1(index)
     }
 

@@ -11,7 +11,6 @@ function EditToolbar() {
     const { store } = useContext(GlobalStoreContext);
     const history = useHistory();
 
-    let enabledButtonClass = "playlister-button";
     
      function addButtonHandler() {
         store.addSongTransaction();
@@ -28,42 +27,45 @@ function EditToolbar() {
         store.closeCurrentList();
     }
     let editStatus = false;
-    if (store.isListNameEditActive) {
+    if (store.songEditActive) {
         editStatus = true;
     }
+     let enabledButtonClass = "playlister-button";
+     let disabledButtonClass = "playlister-button-disabled";
+
     return (
         <span id="edit-toolbar">
             <input
                 type="button"
                 id='add-song-button'
-                disabled={editStatus}
+              //  disabled={false}
                 value="+"
-                className={enabledButtonClass}
+                className={store.isOpen ? enabledButtonClass : disabledButtonClass}
                 onClick={addButtonHandler}
 
             />
             <input
                 type="button"
                 id='undo-button'
-                disabled={editStatus}
+                //disabled={!store.isUndo}
                 value="⟲"
-                className={enabledButtonClass}
+                className={store.isUndo ? enabledButtonClass : disabledButtonClass}
                 onClick={handleUndo}
             />
             <input
                 type="button"
                 id='redo-button'
-                disabled={editStatus}
+                //disabled={!canRedo}
                 value="⟳"
-                className={enabledButtonClass}
+                className={store.isRedo ? enabledButtonClass : disabledButtonClass }
                 onClick={handleRedo}
             />
             <input
                 type="button"
                 id='close-button'
-                disabled={editStatus}
+                //disabled={!canClose}
                 value="&#x2715;"
-                className={enabledButtonClass}
+                className={store.isClose ? enabledButtonClass : disabledButtonClass}
                 onClick={handleClose}
             />
         </span>);
